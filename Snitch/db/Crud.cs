@@ -1,6 +1,6 @@
 using MySql.Data.MySqlClient;
 
-namespace Snitch.db;
+namespace Snitch;
 public class Crud
 {
     private string connectionString;

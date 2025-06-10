@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="MySql.Data" Version="9.3.0" />
+      <PackageReference Include="Bogus" Version="35.4.0" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-namespace Snitch.db;
+namespace Snitch;
 
 public class DbServices
 {
@@ -12,6 +12,7 @@ public class DbServices
             { "firstName", "VARCHAR(255)" },
             { "lastName", "VARCHAR(255)" },
             { "codeName", "VARCHAR(255)" },
+            { "age", "INT" },
             { "password", "VARCHAR(255)" },
             { "address", "VARCHAR(255)" },
             { "phoneNumber", "VARCHAR(255)" },
@@ -38,6 +39,28 @@ public class DbServices
             { "FOREIGN KEY (target_id)", "REFERENCES persons(id)" }
         };
         crud.CreateTable("reports", schema);
+    }
+
+    public int getNumOfPersons()
+    {
+        List<string> column= new List<string>() { "id" };
+        var dic = crud.GetTable("persons", column);
+        return dic.Count;
+    }
+
+    public bool checkIfPersonExists(string codeName, string password)
+    {
+        Dictionary<string, object> details = new Dictionary<string, object>()
+        {
+            { "codeName", codeName },
+            { "password", password }
+        };
+        var res = crud.GetTable("persons",null ,details);
+        if (res.Count > 0)
+        {
+            return true;
+        }
+        return false;
     }
 
 }
