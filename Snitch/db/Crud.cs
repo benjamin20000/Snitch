@@ -1,17 +1,6 @@
 using MySql.Data.MySqlClient;
 
 namespace Snitch.db;
-
-
-
-public enum ComparisonOperator
-{
-    Equals,         // =
-    NotEquals,      // != or <>
-    GreaterThan,    // >
-    LessThan       // <
-}
-
 public class Crud
 {
     private string connectionString;
@@ -107,6 +96,71 @@ public class Crud
             }
         }
     }
+
+     
+    
+    
+public List<Dictionary<string, object>> GetTable(
+    string tableName,
+    List<string>? columns = null,
+    Dictionary<string, object>? conditions = null)
+{
+    if (string.IsNullOrWhiteSpace(tableName))
+    {
+        throw new ArgumentException("Table name must be provided.", nameof(tableName));
+    }
+    
+    var results = new List<Dictionary<string, object>>();
+    
+    string selectedColumns = (columns == null || columns.Count == 0)
+        ? "*"
+        : string.Join(", ", columns.Select(c => $"`{c}`"));
+    
+    string query = $"SELECT {selectedColumns} FROM `{tableName}`";
+    
+    if (conditions != null && conditions.Count > 0)
+    {
+        string conditionsString = string.Join(" AND ", conditions.Keys.Select(k => $"`{k}` = @{k}"));
+        query += $" WHERE {conditionsString}";
+    }
+
+    try
+    {
+        using (var conn = new MySqlConnection(connectionString))
+        {
+            conn.Open();
+            
+            using (var cmd = new MySqlCommand(query, conn))
+            {
+                if (conditions != null)
+                {
+                    foreach (var condition in conditions)
+                    {
+                        cmd.Parameters.AddWithValue($"@{condition.Key}", condition.Value);
+                    }
+                }
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var row = new Dictionary<string, object>();
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            row[reader.GetName(i)] = reader.GetValue(i);
+                        }
+                        results.Add(row);
+                    }
+                }
+            }
+        }
+    }
+    catch (Exception ex){
+         Console.WriteLine($"Error querying `{tableName}`: {ex.Message}");
+    }
+
+    return results;
+}
+    
 //    public List<Dictionary<string, object>> GetTable(
 //     string tableName,
 //     List<string>? columns = null,
