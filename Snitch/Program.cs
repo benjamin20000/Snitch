@@ -2,15 +2,23 @@
 
 class Menu
 {
-    private DbServices dbServices = new DbServices();
-    private void details_validation()
-    {
-    }
-
-    private void creatTables()
-    {
+      private DbServices dbServices = new DbServices();
+      private void details_validation()
+      {
+      }
+  
+      private void creatTables()
+      {
         dbServices.CreatePersonsTable();
-    }
+        Crud crud = new Crud();
+        Dictionary<string,object> data = new Dictionary<string, object>(){
+        {"firstName", "John"},
+        {"lastName", "Doe"},
+        {"codeName", "123"}
+        };
+        crud.InsertRow("persons", data);
+
+      }
     
     private void play_menu()
     {
@@ -24,6 +32,6 @@ class Menu
     {
         Menu menu = new Menu();
         menu.creatTables();
-
+       
     }
 }
