@@ -43,31 +43,41 @@ class Menu
           
           Console.WriteLine("enter a new password:");
           string password = Console.ReadLine();
+          
+          string codeName = GenerateCodeName();
+
 
           Person newPerson = new Person();
           newPerson.firstName = Firstname;
           newPerson.LastName = Lastname;
-          newPerson.codeName = GenerateCodeName();
+          newPerson.codeName = codeName;
           newPerson.Age = Age;
           newPerson.Password = password;
 
           newPerson.insertPersonToTable();
           
           Console.WriteLine("welcome to the system: ");
-          Console.WriteLine($"your code name is {codeNames}");
+          Console.WriteLine($"your code name is {codeName}");
           Console.WriteLine($"your code password is {password}");
           
       }
 
       private void logIn()
       {
-          Console.WriteLine("enter name code code name:");
+          Console.WriteLine("enter code name:");
           string name = Console.ReadLine();
           
           Console.WriteLine("enter password:");
           string password = Console.ReadLine();
-          
-          dbServices.checkIfPersonExists(name, password);
+          bool pass = dbServices.checkIfPersonExists(name, password);
+          if (pass)
+          {
+              Console.WriteLine($"hey { name } welcome back");
+          }
+          else
+          {
+              Console.WriteLine("name or password is incorrect");
+          }
       }
     
     private void play_menu()
