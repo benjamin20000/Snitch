@@ -16,9 +16,9 @@ public class Report
     public string location { get; set; }
     public DateTime report_time { get; set; }
     public string target_type { get; set; }  // individual or gang
-    public int? target_id { get; set; }      // Nullable for gang reports
+    public string target_code_name { get; set; }      // Nullable for gang reports
     public int? gang_id { get; set; }        // Nullable for individual reports
-    private Crud crud = new Crud();
+    private DbServices db_services = new DbServices();
 
     public void insertReportToTable()
     {
@@ -28,13 +28,13 @@ public class Report
             {"report_text", report_text},
             {"location", location},
             {"target_type", target_type},
-            {"target_id", target_id.HasValue ? target_id.Value : DBNull.Value},
+            {"target_code_name", target_code_name},
             {"gang_id", gang_id.HasValue ? gang_id.Value : DBNull.Value}
         };
-        crud.InsertRow("reports", data);
+        Crud.InsertRow("reports", data);
     }
     
-    public static Report createReport(long snitch_id)
+    public static Report createReport(long snitch_id, DbServices db_services)
     {
         Console.WriteLine("lets create a new report");
         Console.WriteLine("what type of target is this report about?");
@@ -53,10 +53,31 @@ public class Report
         
         if (choice == 1)
         {
+            Console.WriteLine("does the target known to us?");
+            Console.WriteLine("1. Yes");
+            Console.WriteLine("2. No");
+            int known = int.Parse(Console.ReadLine());
+            string target_code_name = "";
+            
+            if(known == 1){ //target already exists
+                Console.WriteLine("enter target code name");
+                target_code_name = Console.ReadLine();
+                if (!db_services.checkPersonExits(target_code_name))
+                {
+                    Console.WriteLine("no target code exists");
+                    Environment.Exit(0);
+                }
+            }
+            if (known == 2)
+            {
+                Console.WriteLine("lets create a new target");
+                Person newTarget = Person.createPerson(db_services);
+                target_code_name = newTarget.codeName;
+                newTarget.insertPersonToTable();
+            }
+            
             report.target_type = "Individual";
-            Console.WriteLine("enter target id");
-            int id = int.Parse(Console.ReadLine());
-            report.target_id = id;
+            report.target_code_name = target_code_name;
             report.gang_id = null;
         }
         else if(choice == 2)
@@ -65,7 +86,7 @@ public class Report
             Console.WriteLine("enter gang id");
             int id = int.Parse(Console.ReadLine());
             report.gang_id = id;
-            report.target_id = null;
+            report.target_code_name = null;
         }
         
         Console.WriteLine("enter report text");

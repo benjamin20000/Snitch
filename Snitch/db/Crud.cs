@@ -1,27 +1,26 @@
 using MySql.Data.MySqlClient;
 
 namespace Snitch;
-public class Crud
+public static class Crud
 {
-    private string connectionString;
-
-    public Crud()
-    {
-        connectionString =
-            "server=localhost;" +
-            "user=root;" +
-            "database=Snitch;" +
-            "port=3306;";
-    }
+    private static string connectionString =
+        "server=localhost;" +
+        "user=root;" +
+        "database=Snitch;" +
+        "port=3306;";
     
-    public void CreateTable(string tableName, string schema)
+    
+    public static void CreateTable(string tableName, string schema)
     {
         using (var conn = new MySqlConnection(connectionString))
         {
             try
             {
                 conn.Open();
-                string query = $"CREATE TABLE IF NOT EXISTS `{tableName}` ({schema})";
+
+                var columnDefinitions = new List<string>();
+                Console.WriteLine($"CREATE TABLE IF NOT EXISTS `{tableName}` ({schema});");
+                string query = $"CREATE TABLE IF NOT EXISTS `{tableName}` ({schema});";
 
                 var cmd = new MySqlCommand(query, conn);
                 cmd.ExecuteNonQuery();
@@ -35,7 +34,7 @@ public class Crud
         }
     }
 
-    public void DropTable(string tableName)
+    public static void DropTable(string tableName)
     {
         string query = $"DROP TABLE IF EXISTS `{tableName}`";
         try
@@ -57,7 +56,7 @@ public class Crud
      
     
     
-    public long InsertRow(string tableName, Dictionary<string, object> data)
+    public static long InsertRow(string tableName, Dictionary<string, object> data)
     {
         if (data == null || data.Count == 0)
         {
@@ -66,7 +65,7 @@ public class Crud
         
         string columnNames = string.Join(", ", data.Keys.Select(k => $"`{k}`"));
         string parameterNames = string.Join(", ", data.Keys.Select(k => $"@{k}"));
-        string query = $"INSERT INTO `{tableName}` ({columnNames}) VALUES ({parameterNames});";
+        string query = $"INSERT INTO `{tableName}` ({columnNames}) VALUES ({parameterNames})";
         
         using (var connection = new MySqlConnection(connectionString))
         {
@@ -81,7 +80,6 @@ public class Crud
                 {
                     connection.Open();
                     command.ExecuteNonQuery();
-                    Console.WriteLine(command.LastInsertedId);
                     return command.LastInsertedId;
                 }
                 catch (MySqlException ex)
@@ -96,7 +94,7 @@ public class Crud
      
     
     
-public List<Dictionary<string, object>> GetTable(
+public static List<Dictionary<string, object>> GetTable(
     string tableName,
     List<string>? columns = null,
     Dictionary<string, object>? conditions = null)
