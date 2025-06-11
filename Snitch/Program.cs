@@ -15,7 +15,7 @@ class Menu
           string[] animals = new[] { "Tiger", "Lion", "Eagle", "Wolf", "Fox", "Bear", "Hawk", "Dragon", "Falcon", "Cobra" };
           string animal = faker.Random.ArrayElement(animals);
           string color = faker.Commerce.Color();
-          string numOfPersons = dbServices.getNumOfPersons().ToString();
+          string numOfPersons = dbServices.counColumns("persons").ToString();
           Console.WriteLine(numOfPersons);
           return $"{color}{animal}{numOfPersons}";
       }
@@ -25,7 +25,14 @@ class Menu
       private void creatTables()
       {
         dbServices.CreatePersonsTable();
-    
+        dbServices.CreateReportsTable();
+      }
+
+      private void snitchErea(long snitch_id)
+      {
+          Report new_report = Report.createReport(snitch_id);
+          new_report.insertReportToTable();
+
 
       }
       
@@ -54,30 +61,38 @@ class Menu
           newPerson.Age = Age;
           newPerson.Password = password;
 
-          newPerson.insertPersonToTable();
+          long id = newPerson.insertPersonToTable();
           
           Console.WriteLine("welcome to the system: ");
           Console.WriteLine($"your code name is {codeName}");
           Console.WriteLine($"your code password is {password}");
-          
+
+          snitchErea(id);
+
       }
 
       private void logIn()
       {
           Console.WriteLine("enter code name:");
-          string name = Console.ReadLine();
+          string code_name = Console.ReadLine();
           
           Console.WriteLine("enter password:");
           string password = Console.ReadLine();
-          bool pass = dbServices.checkIfPersonExists(name, password);
-          if (pass)
+          
+          var person = dbServices.getOneRowByUniqueVal("persons","codeName",code_name);
+          if (person == null || person.Count == 0)
           {
-              Console.WriteLine($"hey { name } welcome back");
+              Console.WriteLine("code name not found");
+              return;
           }
-          else
+
+          if (person["password"].ToString() != password)
           {
-              Console.WriteLine("name or password is incorrect");
+              Console.WriteLine("incorrect password");
+              return;
           }
+          Console.WriteLine($"hey { code_name } welcome back"); 
+          snitchErea(Convert.ToInt64(person["id"]));
       }
     
     private void play_menu()
@@ -102,10 +117,12 @@ class Menu
             return;
         }
     }
+    
     static void Main(string[] args)
     {
         Menu menu = new Menu();
+        // menu.creatTables();
         menu.play_menu();
-
+        
     }
 }

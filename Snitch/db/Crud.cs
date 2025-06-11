@@ -14,20 +14,14 @@ public class Crud
             "port=3306;";
     }
     
-    public void CreateTable(string tableName, Dictionary<string, string> schema)
+    public void CreateTable(string tableName, string schema)
     {
         using (var conn = new MySqlConnection(connectionString))
         {
             try
             {
                 conn.Open();
-
-                var columnDefinitions = new List<string>();
-                foreach (var column in schema)
-                {
-                    columnDefinitions.Add($"`{column.Key}` {column.Value}");
-                }
-                string query = $"CREATE TABLE IF NOT EXISTS `{tableName}` ({string.Join(", ", columnDefinitions)})";
+                string query = $"CREATE TABLE IF NOT EXISTS `{tableName}` ({schema})";
 
                 var cmd = new MySqlCommand(query, conn);
                 cmd.ExecuteNonQuery();
@@ -63,7 +57,7 @@ public class Crud
      
     
     
-    public void InsertRow(string tableName, Dictionary<string, object> data)
+    public long InsertRow(string tableName, Dictionary<string, object> data)
     {
         if (data == null || data.Count == 0)
         {
@@ -72,7 +66,7 @@ public class Crud
         
         string columnNames = string.Join(", ", data.Keys.Select(k => $"`{k}`"));
         string parameterNames = string.Join(", ", data.Keys.Select(k => $"@{k}"));
-        string query = $"INSERT INTO `{tableName}` ({columnNames}) VALUES ({parameterNames})";
+        string query = $"INSERT INTO `{tableName}` ({columnNames}) VALUES ({parameterNames});";
         
         using (var connection = new MySqlConnection(connectionString))
         {
@@ -86,7 +80,9 @@ public class Crud
                 try
                 {
                     connection.Open();
-                    command.ExecuteNonQuery(); 
+                    command.ExecuteNonQuery();
+                    Console.WriteLine(command.LastInsertedId);
+                    return command.LastInsertedId;
                 }
                 catch (MySqlException ex)
                 {

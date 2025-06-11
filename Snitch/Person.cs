@@ -4,12 +4,14 @@ namespace Snitch;
 
 public class Person
 {
+    public long id { get; set; }
     public string firstName { get; set; }
     public string LastName { get; set; }
     public string codeName { get; set; }
     public int Age { get; set; }
     public string Password { get; set; }
     private Crud crud = new Crud();
+    private DbServices db_services = new DbServices();
 
     // public Person(string firstName, string lastName, string codeName, string email, int age)
     // {
@@ -21,7 +23,7 @@ public class Person
     //     insertPersonToTable();
     // }
 
-    public void insertPersonToTable()
+    public long insertPersonToTable()
     {
         Dictionary<string,object> data = new Dictionary<string, object>(){
             {"firstName", firstName},
@@ -30,6 +32,6 @@ public class Person
             {"age", Age},
             {"password", Password},
         };
-        crud.InsertRow("persons",data); 
+        return crud.InsertRow("persons",data); 
     }
 }
