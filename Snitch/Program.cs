@@ -61,12 +61,29 @@ class Menu
           Console.WriteLine($"hey { code_name } welcome back"); 
           snitchErea(Convert.ToInt64(person["id"]));
       }
+
+      private void adminErea()
+      {
+          Console.WriteLine("1. reporters");
+          int ch = int.Parse(Console.ReadLine());
+          if (ch == 1)
+          {
+              PersonsAnaytic.printReporters();
+              
+          }
+
+          if (ch == 2)
+          {
+              PersonsAnaytic.printReporteds();
+          }
+      }
     
     private void play_menu()
     {
         Console.WriteLine("Welcome to Snitch!");
         Console.WriteLine("1 log in");
         Console.WriteLine("2 sign up");
+        Console.WriteLine("3 admin area");
         
         int choice = int.Parse(Console.ReadLine());
 
@@ -77,6 +94,10 @@ class Menu
         else if (choice == 2)
         {
             signUp();
+        }
+        else if (choice == 3)
+        {
+            adminErea();
         }
         else
         {

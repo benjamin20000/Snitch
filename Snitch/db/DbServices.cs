@@ -39,7 +39,7 @@ public class DbServices
     
     
 
-    public int counColumns(string table_name)
+    public int counRows(string table_name)
     {
         List<string> column= new List<string>() { "id" };
         var dic = Crud.GetTable(table_name, column);

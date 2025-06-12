@@ -1,3 +1,4 @@
+using System.Data;
 using MySql.Data.MySqlClient;
 
 namespace Snitch;
@@ -52,7 +53,6 @@ public static class Crud
             Console.WriteLine("Error creating table: " + ex.Message);
         }
     }
-
      
     
     
@@ -91,8 +91,63 @@ public static class Crud
         }
     }
 
-     
-    
+    public static void UpdateRow(string tableName, Dictionary<string, object> updates, Dictionary<string, object> row)
+    {
+        
+        string query = $"UPDATE `{tableName}` SET ";
+        foreach (var item in updates)
+        {
+            query += $"{item.Key} = {item.Key}";
+        }
+        query += $" WHERE `{row}` = '{row}'";
+        using (var connection = new MySqlConnection(connectionString))
+        {
+            using (var command = new MySqlCommand(query, connection))
+            {
+                try
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+                catch (MySqlException ex)
+                {
+                    Console.WriteLine($"Database error occurred: {ex.Message}");
+                    throw;
+                }
+            }
+        }
+    }
+
+    public static List<Dictionary<string, object>> generalGetFuc(string query)
+    {
+        var results = new List<Dictionary<string, object>>();
+        try
+        {
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var row = new Dictionary<string, object>();
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                row[reader.GetName(i)] = reader.GetValue(i);
+                            }
+                            results.Add(row);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex){
+            Console.WriteLine($"Error querying: {ex.Message}");
+        }
+        return results;
+    }
     
 public static List<Dictionary<string, object>> GetTable(
     string tableName,

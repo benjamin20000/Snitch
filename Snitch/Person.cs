@@ -40,7 +40,7 @@ public class Person
         string[] animals = new[] { "Tiger", "Lion", "Eagle", "Wolf", "Fox", "Bear", "Hawk", "Dragon", "Falcon", "Cobra" };
         string animal = faker.Random.ArrayElement(animals);
         string color = faker.Commerce.Color();
-        string numOfPersons = dbServices.counColumns("persons").ToString();
+        string numOfPersons = dbServices.counRows("persons").ToString();
         string newCodeName = $"{color}{animal}{numOfPersons}";
         Console.WriteLine($"new code name Generated {newCodeName}");
         return newCodeName;
